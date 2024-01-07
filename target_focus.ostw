@@ -1,0 +1,535 @@
+//
+globalvar define human_spawn_location;
+globalvar define bot_spawn_location;
+globalvar define human_ready;
+globalvar define timer_current;
+globalvar define timer_start;
+globalvar define timer_add;
+globalvar define bot_team;
+globalvar define bot_death;
+globalvar define bot_target;
+globalvar define rest_of_bot_team;
+playervar define healing_ref;
+globalvar define bot_random_spawn;
+globalvar define human_random_spawn;
+playervar define bot_movement;
+globalvar define bot_movement_time;
+globalvar define menu_pos;
+globalvar define menu_depth;
+globalvar define menu_strings;
+globalvar define in_menu;
+globalvar define current_string;
+globalvar define tank_id;
+globalvar define dps_1_id;
+globalvar define dps_2_id;
+globalvar define support_1_id;
+globalvar define support_2_id;
+globalvar define target_method;
+globalvar define total_time;
+//SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())*Forward() LEFT RIGHT MOVE SPEED
+//SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())) BACK FORWARD MOVESPEED
+rule:"Setup"
+{
+    human_ready = false;
+    target_method = 0;
+    total_time = 0;
+    human_spawn_location = Vector(10,0,0);
+    bot_spawn_location = Vector(0,0,0);
+    tank_id = 0;
+    dps_1_id = 0;
+    dps_2_id = 1;
+    support_1_id = 0;
+    support_2_id = 1;
+    bot_team = [AllTankHeroes()[tank_id], AllDamageHeroes()[dps_1_id], AllDamageHeroes()[dps_2_id], AllSupportHeroes()[support_1_id], AllSupportHeroes()[support_2_id]];
+
+    timer_current = 0;
+    timer_start = 5;
+    timer_add = 4;
+    bot_death = 0;
+    bot_random_spawn = 3;
+    human_random_spawn = 3;
+    bot_movement_time = 1;
+    menu_pos = 0;
+    menu_depth = 0;
+    in_menu = false;
+    menu_strings[0][0] = "Ready Up";
+    menu_strings[0][1] = "Set Human Spawn Location";
+    menu_strings[0][2] = "Set Bot Spawn Location";
+    menu_strings[0][3] = "Advanced Settings";
+    menu_strings[0][4] = "Exit";
+    menu_strings[0][5] = "EOF";
+
+    menu_strings[1][0] = "Adjust Bot Team";
+    menu_strings[1][1] = "Adjust Timings";
+    menu_strings[1][2] = "Adjust Spacing";
+    menu_strings[1][3] = "Switch Target Selection";
+    menu_strings[1][4] = "Exit";
+    menu_strings[1][5] = "EOF";
+
+    menu_strings[2][0] = "Tank: {0}".Format([bot_team[0]]);
+    menu_strings[2][1] = "DPS 1: {0}".Format([bot_team[1]]);
+    menu_strings[2][2] = "DPS 2: {0}".Format([bot_team[2]]);
+    menu_strings[2][3] = "Support 1: {0}".Format([bot_team[3]]);
+    menu_strings[2][4] = "Support 2: {0}".Format([bot_team[4]]);
+    menu_strings[2][5] = "Exit";
+    menu_strings[2][6] = "EOF";
+
+    menu_strings[3][0] = "Increase Starting Time: {0}s".Format([timer_start]);
+    menu_strings[3][1] = "Decrease Starting Time";
+    menu_strings[3][2] = "Increase Bonus Time: {0}s".Format([timer_add]);
+    menu_strings[3][3] = "Decrease Bonus Time";
+    menu_strings[3][4] = "Exit";
+    menu_strings[3][5] = "EOF";
+
+    menu_strings[4][0] = "Increase Human Spacing: {0}M".Format([human_random_spawn]);
+    menu_strings[4][1] = "Decrease Human Spacing";
+    menu_strings[4][2] = "Increase Bot Spacing: {0}M".Format([bot_random_spawn]);
+    menu_strings[4][3] = "Decrease Bot Spacing";
+    menu_strings[4][4] = "Exit";
+    menu_strings[4][5] = "EOF";
+}
+
+
+rule: "Create Menu"
+Event.OngoingPlayer
+if(human_ready == false)
+if(in_menu == false)
+if(EventPlayer() == PlayersInSlot(0,Team.Team1))
+if(IsButtonHeld(EventPlayer(),Button.Interact))
+{
+    //create spawn menu
+    menu_pos = 0;
+    menu_depth = 0;
+    
+    menu_strings[0][0] = "->"+menu_strings[0][0];
+    SetMoveSpeed(EventPlayer(),1);
+    CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[0][0],menu_strings[0][1],"{0}\n{1}\n{2}".Format([menu_strings[0][2],menu_strings[0][3],menu_strings[0][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+    Wait(0.25);
+    in_menu = true;
+}
+
+rule: "Move Menu"
+Event.OngoingPlayer
+if(in_menu == true)
+if(EventPlayer() == PlayersInSlot(0,Team.Team1))
+{
+    if(SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())) > 0)
+    {
+        menu_pos --;
+        if(menu_pos < 0)
+        {
+            menu_pos = 0;
+        }
+        else
+        {
+            menu_strings[menu_depth][menu_pos+1] = StringSlice( menu_strings[menu_depth][menu_pos+1],2,100);
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+        }
+    }
+    if(SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())) < 0)
+    {
+        menu_pos ++;
+        if(menu_strings[menu_depth][menu_pos] == "EOF")
+        {
+            menu_pos --;
+        }
+        else
+        {
+            menu_strings[menu_depth][menu_pos-1] = StringSlice( menu_strings[menu_depth][menu_pos-1],2,100);
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+        }
+    }
+    Wait(0.2);
+    LoopIfConditionIsTrue();
+}
+
+rule: "Interact Menu"
+Event.OngoingPlayer
+if(in_menu == true)
+if(EventPlayer() == PlayersInSlot(0,Team.Team1))
+if(IsButtonHeld(EventPlayer(),Button.Interact))
+{
+    if(menu_depth == 0)
+    {
+        if(menu_pos == 0)//ready up
+        {
+            human_ready = true;
+            in_menu = false;
+            DestroyAllHudText();
+            SetMoveSpeed(EventPlayer(),100);
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+        }
+        else if(menu_pos == 1)//set human spawn
+        {
+            human_spawn_location = PositionOf(EventPlayer());
+            SmallMessage(AllPlayers(),"Human Spawn Set to: " + human_spawn_location);
+        }
+        else if(menu_pos == 2)//set bot spawn
+        {
+            bot_spawn_location = PositionOf(EventPlayer());
+            SmallMessage(AllPlayers(),"Bot Spawn Set to: " + bot_spawn_location);
+        }
+        else if(menu_pos == 3)//settings
+        {
+            //settings
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 1;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            DestroyAllHudText();
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+        }
+        else if(menu_pos == 4)//exit
+        {
+            //exit
+            SetMoveSpeed(EventPlayer(),100);
+            DestroyAllHudText();
+            Wait(0.25);
+            in_menu = false;
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+        }
+    }
+    else if(menu_depth == 1)
+    {
+        if(menu_pos == 0)
+        {
+            //change bot team
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 2;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            DestroyAllHudText();
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[2][0],menu_strings[2][1],"{0}\n{1}\n{2}".Format([menu_strings[2][2],menu_strings[2][3],"{0}\n{1}".Format([menu_strings[2][4],menu_strings[2][5]])])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
+        }
+        if(menu_pos == 1)
+        {
+            //change timings
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 3;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            DestroyAllHudText();
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[3][0],menu_strings[3][1],"{0}\n{1}\n{2}".Format([menu_strings[3][2],menu_strings[3][3],menu_strings[3][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+        }
+        if(menu_pos == 2)
+        {
+            //change spacing
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 4;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            DestroyAllHudText();
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[4][0],menu_strings[4][1],"{0}\n{1}\n{2}".Format([menu_strings[4][2],menu_strings[4][3],menu_strings[4][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+        }
+        if(menu_pos == 3)
+        {
+            //change target selection
+            if(target_method == 0)
+            {
+                target_method = 1;
+                SmallMessage(EventPlayer(),"Target Selection Changed to Manual");
+            }
+            else
+            {
+                target_method = 0;
+                SmallMessage(EventPlayer(),"Target Selection Changed to Auto");
+            }
+        }
+        if(menu_pos == 4)
+        {
+            //exit
+            DestroyAllHudText();
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 0;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[0][0],menu_strings[0][1],"{0}\n{1}\n{2}".Format([menu_strings[0][2],menu_strings[0][3],menu_strings[0][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+        }
+    }
+    else if(menu_depth == 2)
+    {
+        if(menu_pos == 0)
+        {
+            tank_id ++;
+            if(tank_id > 11)
+            {
+                tank_id = 0;
+            }
+            bot_team[0] = AllTankHeroes()[tank_id];
+            menu_strings[2][0] = "->Tank: {0}".Format([bot_team[0]]);
+        }
+        if(menu_pos == 1)
+        {
+            dps_1_id ++;
+            if(dps_1_id > 16)
+            {
+                dps_1_id = 0;
+            }
+            bot_team[1] = AllDamageHeroes()[dps_1_id];
+            menu_strings[2][1] = "->DPS 1: {0}".Format([bot_team[1]]);
+        }
+        if(menu_pos == 2)
+        {
+            dps_2_id ++;
+            if(dps_2_id > 16)
+            {
+                dps_2_id = 0;
+            }
+            bot_team[2] = AllDamageHeroes()[dps_2_id];
+            menu_strings[2][2] = "->DPS 1: {0}".Format([bot_team[2]]);
+        }
+        if(menu_pos == 3)
+        {
+            support_1_id ++;
+            if(support_1_id > 8)
+            {
+                support_1_id = 0;
+            }
+            bot_team[3] = AllSupportHeroes()[support_1_id];
+            menu_strings[2][3] = "->Support 1: {0}".Format([bot_team[3]]);
+        }
+        if(menu_pos == 4)
+        {
+            support_2_id ++;
+            if(support_2_id > 8)
+            {
+                support_2_id = 0;
+            }
+            bot_team[4] = AllSupportHeroes()[support_2_id];
+            menu_strings[2][4] = "->Support 1: {0}".Format([bot_team[4]]);
+        }
+        if(menu_pos == 5)
+        {
+            DestroyAllHudText();
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 1;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+        }
+    }
+    else if(menu_depth == 3)
+    {
+        if(menu_pos == 0)
+        {
+            timer_start += 0.5;
+            menu_strings[3][0] = "->Increase Starting Time: {0}".Format([timer_start]);
+        }
+        if(menu_pos == 1)
+        {
+            timer_start -= 0.5;
+            if(timer_start < 0.5)
+            {
+                timer_start = 0.5;
+            }
+            menu_strings[3][0] = "Increase Starting Time: {0}".Format([timer_start]);
+        }
+        if(menu_pos == 2)
+        {
+            timer_add += 0.5;
+            menu_strings[3][2] = "->Increase Bonus Time: {0}".Format([timer_add]);
+        }
+        if(menu_pos == 3)
+        {
+            timer_add -= 0.5;
+            if(timer_add < 0)
+            {
+                timer_add = 0;
+            }
+            menu_strings[3][2] = "Increase Bonus Time: {0}".Format([timer_add]);
+        }
+        if(menu_pos == 4)
+        {
+            //exit
+            DestroyAllHudText();
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 1;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+        }
+    }
+    else if(menu_depth == 4)
+    {
+        if(menu_pos == 0)
+        {
+            human_random_spawn += 0.5;
+            menu_strings[4][0] = "->Increase Human Spacing: {0}M".Format([human_random_spawn]);
+        }
+        if(menu_pos == 1)
+        {
+            human_random_spawn -= 0.5;
+            if(human_random_spawn < 0)
+            {
+                human_random_spawn = 0;
+            }
+            menu_strings[4][0] = "Increase Human Spacing: {0}M".Format([human_random_spawn]);
+        }
+        if(menu_pos == 2)
+        {
+            bot_random_spawn += 0.5;
+            menu_strings[4][2] = "->Increase Bot Spacing: {0}M".Format([bot_random_spawn]);
+        }
+        if(menu_pos == 3)
+        {
+            bot_random_spawn -= 0.5;
+            if(bot_random_spawn < 0)
+            {
+                bot_random_spawn = 0;
+            }
+            menu_strings[4][2] = "Increase Bot Spacing: {0}M".Format([bot_random_spawn]);
+        }
+        if(menu_pos == 4)
+        {
+            //exit
+            DestroyAllHudText();
+            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            menu_depth = 1;
+            menu_pos = 0;
+            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+        }
+    }
+}
+
+
+
+rule: "Is Ready"
+Event.OngoingGlobal
+if(human_ready == true)
+{   
+    DestroyAllHudText();
+    //move players
+    for(define i = 0; i < 5; i++)
+    {
+        Teleport(PlayersInSlot(i,Team.Team1),human_spawn_location+Vector(RandomReal(-human_random_spawn,human_random_spawn),0,RandomReal(-human_random_spawn,human_random_spawn)));
+        SetFacing(PlayersInSlot(i,Team.Team1),DirectionTowards(PlayersInSlot(i,Team.Team1),bot_spawn_location),Relative.ToWorld);
+    }
+    Wait(0.5);
+    SetStatus(AllPlayers(),null,Status.Frozen,3);
+    //create bots
+    for(define i = 0; i < 5; i++)
+    {
+        bot_target = CreateDummyBot(bot_team[i],Team.Team2,i,bot_spawn_location+Vector(RandomReal(-bot_random_spawn,bot_random_spawn),0,RandomReal(-bot_random_spawn,bot_random_spawn)),DirectionTowards(bot_spawn_location,PlayersInSlot(0,Team.Team1)));
+        if(target_method == 0)
+        {
+            SetDamageReceived(bot_target,10);
+            bot_target.healing_ref = StartHealOverTime(LastCreatedEntity(),null,200,50);
+        }
+        else
+        {
+            bot_target.healing_ref = StartHealOverTime(LastCreatedEntity(),null,200,100);
+            SetMaxHealth(bot_target,200);
+        }
+        bot_target.bot_movement = false;
+        MinWait();
+    }
+    SetAbilityCooldown(AllPlayers(),Button.Ability1,0);
+    SetAbilityCooldown(AllPlayers(),Button.Ability2,0);
+    SmallMessage(AllPlayers(),"Starting in 3");
+    Wait(1);
+    SmallMessage(AllPlayers(),"Starting in 2");
+    Wait(1);
+    SmallMessage(AllPlayers(),"Starting in 1");
+    Wait(1);
+    timer_current = timer_start;
+    total_time = 0;
+    if(target_method == 0)
+    {
+        bot_target = RandomValueInArray(AllLivingPlayers(Team.Team2));
+        SetDamageReceived(bot_target,100);
+        CreateHudText(AllPlayers(),"Time Left: {0}\nTarget: {1}".Format([timer_current,HeroIconString(HeroOf(bot_target))]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
+        CreateHudText(AllPlayers(),null,null,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n{0}".Format([HeroIconString(HeroOf(bot_target))]),Location.Top,1,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
+    }
+    else
+    {
+        CreateHudText(AllPlayers(),"Time Left: {0}".Format([timer_current]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
+    }
+
+    AllLivingPlayers(Team.Team2).bot_movement = true;
+
+}
+
+rule: "Timer"
+Event.OngoingGlobal
+if(timer_current > 0)
+{
+    while(timer_current > 0 && bot_death != 5)
+    {
+        Wait(1/10);
+        timer_current -= 1/10;
+        total_time += 1/10;
+    }
+    DestroyAllDummyBots();
+    DestroyAllHudText();
+    if(timer_current == 0)
+    {
+        SmallMessage(AllPlayers(),"Failed to Kill all Bots in Time");
+    }
+    if(bot_death == 5)
+    {
+        SmallMessage(AllPlayers(),"Killed all Bots in {0}s".Format([total_time]));
+    }
+    human_ready = false;
+    timer_current = 0;
+    bot_death = 0;
+}
+
+rule: "Bot Death"
+Event.OnDeath
+if(TeamOf(Victim()) == Team.Team2)
+{
+    timer_current += timer_add;
+    bot_death ++;
+    if(target_method == 0)
+    {
+        bot_target = RandomValueInArray(AllLivingPlayers(Team.Team2));
+        SetDamageReceived(bot_target,100);
+    }
+    Wait(0.1);
+    DestroyDummyBot(Team.Team2,SlotOf(Victim()));
+}
+
+rule: "Bot Movement"
+Event.OngoingGlobal
+if(timer_current > 0)
+{
+    define temp_point = bot_spawn_location + Vector(RandomReal(-bot_random_spawn,bot_random_spawn),0,RandomReal(-bot_random_spawn,bot_random_spawn));
+    define temp_direction = DirectionTowards(FirstOf(AllLivingPlayers(Team.Team2)),temp_point);
+    StartThrottleInDirection(AllLivingPlayers(Team.Team2),temp_direction,1);
+    Wait(RandomReal(bot_movement_time*0.8,bot_movement_time*1.2));
+    LoopIfConditionIsTrue();
+}
+
+rule: "Queen Speed Boost"
+Event.OngoingPlayer
+if(TeamOf(EventPlayer()) == Team.Team2)
+if(HeroOf(EventPlayer()) == Hero.JunkerQueen)
+if(timer_current > 0)
+{
+    PressButton(EventPlayer(),Button.Ability1);
+    Wait(3);
+    LoopIfConditionIsTrue();
+}
+
+rule: "Frog Speed Boost"
+Event.OngoingPlayer
+if(TeamOf(EventPlayer()) == Team.Team2)
+if(HeroOf(EventPlayer()) == Hero.JunkerQueen)
+if(timer_current > 0)
+{
+    PressButton(EventPlayer(),Button.Ability2);
+    Wait(3);
+    LoopIfConditionIsTrue();
+}
+
+rule: "Bot Facing"
+Event.OngoingPlayer
+if(timer_current > 0)
+if(TeamOf(EventPlayer()) == Team.Team2)
+{
+    SetFacing(EventPlayer(),DirectionTowards(EventPlayer(),ClosestPlayerTo(EventPlayer(),Team.Team1)),Relative.ToWorld);
+    Wait(1/3);
+    LoopIfConditionIsTrue();
+}
+
