@@ -1,4 +1,3 @@
-//
 globalvar define human_spawn_location;
 globalvar define bot_spawn_location;
 globalvar define human_ready;
@@ -8,17 +7,13 @@ globalvar define timer_add;
 globalvar define bot_team;
 globalvar define bot_death;
 globalvar define bot_target;
-globalvar define rest_of_bot_team;
-playervar define healing_ref;
 globalvar define bot_random_spawn;
 globalvar define human_random_spawn;
-playervar define bot_movement;
 globalvar define bot_movement_time;
 globalvar define menu_pos;
 globalvar define menu_depth;
 globalvar define menu_strings;
 globalvar define in_menu;
-globalvar define current_string;
 globalvar define tank_id;
 globalvar define dps_1_id;
 globalvar define dps_2_id;
@@ -26,14 +21,98 @@ globalvar define support_1_id;
 globalvar define support_2_id;
 globalvar define target_method;
 globalvar define total_time;
-//SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())*Forward() LEFT RIGHT MOVE SPEED
-//SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())) BACK FORWARD MOVESPEED
-rule:"Setup"
+globalvar define _arrayConstructor;
+globalvar define i;
+globalvar define i_0;
+globalvar define temp_point;
+globalvar define temp_direction;
+playervar define healing_ref;
+playervar define bot_movement;
+globalvar define dva_range;
+globalvar define dva_damage;
+globalvar define doomfist_range;
+globalvar define doomfist_damage;
+globalvar define queen_range;
+globalvar define queen_damage;
+globalvar define mauga_range;
+globalvar define mauga_damage;
+globalvar define orisa_range;
+globalvar define orisa_damage;
+globalvar define ram_range;
+globalvar define ram_damage;
+globalvar define rein_range;
+globalvar define rein_damage;
+globalvar define hog_range;
+globalvar define hog_damage;
+globalvar define sigma_range;
+globalvar define sigma_damage;
+globalvar define winton_range;
+globalvar define winton_damage;
+globalvar define ball_range;
+globalvar define ball_damage;
+globalvar define zarya_range;
+globalvar define zarya_damage;
+globalvar define ashe_range;
+globalvar define ashe_damage;
+globalvar define bastion_range;
+globalvar define bastion_damage;
+globalvar define cassidy_range;
+globalvar define cassidy_damage;
+globalvar define echo_range;
+globalvar define echo_damage;
+globalvar define genji_range;
+globalvar define genji_damage;
+globalvar define hanzo_range;
+globalvar define hanzo_damage;
+globalvar define junkrat_range;
+globalvar define junkrat_damage;
+globalvar define mei_range;
+globalvar define mei_damage;
+globalvar define pharah_range;
+globalvar define pharah_damage;
+globalvar define reaper_range;
+globalvar define reaper_damage;
+globalvar define sojourn_range;
+globalvar define sojourn_damage;
+globalvar define soldier_range;
+globalvar define soldier_damage;
+globalvar define sombra_range;
+globalvar define sombra_damage;
+globalvar define sym_range;
+globalvar define sym_damage;
+globalvar define torb_range;
+globalvar define torb_damage;
+globalvar define tracer_range;
+globalvar define tracer_damage;
+globalvar define widow_range;
+globalvar define widow_damage;
+globalvar define ana_range;
+globalvar define ana_damage;
+globalvar define bap_range;
+globalvar define bap_damage;
+globalvar define brig_range;
+globalvar define brig_damage;
+globalvar define illari_range;
+globalvar define illari_damage;
+globalvar define kiriko_range;
+globalvar define kiriko_damage;
+globalvar define weaver_range;
+globalvar define weaver_damage;
+globalvar define lucio_range;
+globalvar define lucio_damage;
+globalvar define mercy_range;
+globalvar define mercy_damage;
+globalvar define moira_range;
+globalvar define moira_damage;
+globalvar define zen_range;
+globalvar define zen_damage;
+
+rule: "Setup"
 {
     human_ready = false;
     target_method = 0;
     total_time = 0;
-    human_spawn_location = Vector(10,0,0);
+    human_spawn_location = Vector(10, 0, 0);
     bot_spawn_location = Vector(0,0,0);
     tank_id = 0;
     dps_1_id = 0;
@@ -41,7 +120,6 @@ rule:"Setup"
     support_1_id = 0;
     support_2_id = 1;
     bot_team = [AllTankHeroes()[tank_id], AllDamageHeroes()[dps_1_id], AllDamageHeroes()[dps_2_id], AllSupportHeroes()[support_1_id], AllSupportHeroes()[support_2_id]];
-
     timer_current = 0;
     timer_start = 5;
     timer_add = 4;
@@ -52,423 +130,825 @@ rule:"Setup"
     menu_pos = 0;
     menu_depth = 0;
     in_menu = false;
-    menu_strings[0][0] = "Ready Up";
-    menu_strings[0][1] = "Set Human Spawn Location";
-    menu_strings[0][2] = "Set Bot Spawn Location";
-    menu_strings[0][3] = "Advanced Settings";
-    menu_strings[0][4] = "Exit";
-    menu_strings[0][5] = "EOF";
+    _arrayConstructor = FirstOf(menu_strings);
+    _arrayConstructor[0] = "Ready Up";
+    menu_strings[0] = _arrayConstructor;
+    _arrayConstructor = FirstOf(menu_strings);
+    _arrayConstructor[1] = "Set Human Spawn Location";
+    menu_strings[0] = _arrayConstructor;
+    _arrayConstructor = FirstOf(menu_strings);
+    _arrayConstructor[2] = "Set Bot Spawn Location";
+    menu_strings[0] = _arrayConstructor;
+    _arrayConstructor = FirstOf(menu_strings);
+    _arrayConstructor[3] = "Advanced Settings";
+    menu_strings[0] = _arrayConstructor;
+    _arrayConstructor = FirstOf(menu_strings);
+    _arrayConstructor[4] = "Exit";
+    menu_strings[0] = _arrayConstructor;
+    _arrayConstructor = FirstOf(menu_strings);
+    _arrayConstructor[5] = "EOF";
+    menu_strings[0] = _arrayConstructor;
+    _arrayConstructor = menu_strings[1];
+    _arrayConstructor[0] = "Adjust Bot Team";
+    menu_strings[1] = _arrayConstructor;
+    _arrayConstructor = menu_strings[1];
+    _arrayConstructor[1] = "Adjust Timings";
+    menu_strings[1] = _arrayConstructor;
+    _arrayConstructor = menu_strings[1];
+    _arrayConstructor[2] = "Adjust Spacing";
+    menu_strings[1] = _arrayConstructor;
+    _arrayConstructor = menu_strings[1];
+    _arrayConstructor[3] = "Switch Target Selection";
+    menu_strings[1] = _arrayConstructor;
+    _arrayConstructor = menu_strings[1];
+    _arrayConstructor[4] = "Exit";
+    menu_strings[1] = _arrayConstructor;
+    _arrayConstructor = menu_strings[1];
+    _arrayConstructor[5] = "EOF";
+    menu_strings[1] = _arrayConstructor;
+    _arrayConstructor = menu_strings[2];
+    _arrayConstructor[0] = <"Tank: <0>", FirstOf(bot_team)>;
+    menu_strings[2] = _arrayConstructor;
+    _arrayConstructor = menu_strings[2];
+    _arrayConstructor[1] = <"DPS 1: <0>", bot_team[1]>;
+    menu_strings[2] = _arrayConstructor;
+    _arrayConstructor = menu_strings[2];
+    _arrayConstructor[2] = <"DPS 2: <0>", bot_team[2]>;
+    menu_strings[2] = _arrayConstructor;
+    _arrayConstructor = menu_strings[2];
+    _arrayConstructor[3] = <"Support 1: <0>", bot_team[3]>;
+    menu_strings[2] = _arrayConstructor;
+    _arrayConstructor = menu_strings[2];
+    _arrayConstructor[4] = <"Support 2: <0>", bot_team[4]>;
+    menu_strings[2] = _arrayConstructor;
+    _arrayConstructor = menu_strings[2];
+    _arrayConstructor[5] = "Exit";
+    menu_strings[2] = _arrayConstructor;
+    _arrayConstructor = menu_strings[2];
+    _arrayConstructor[6] = "EOF";
+    menu_strings[2] = _arrayConstructor;
+    _arrayConstructor = menu_strings[3];
+    _arrayConstructor[0] = <"Increase Starting Time: <0>s", timer_start>;
+    menu_strings[3] = _arrayConstructor;
+    _arrayConstructor = menu_strings[3];
+    _arrayConstructor[1] = "Decrease Starting Time";
+    menu_strings[3] = _arrayConstructor;
+    _arrayConstructor = menu_strings[3];
+    _arrayConstructor[2] = <"Increase Bonus Time: <0>s", timer_add>;
+    menu_strings[3] = _arrayConstructor;
+    _arrayConstructor = menu_strings[3];
+    _arrayConstructor[3] = "Decrease Bonus Time";
+    menu_strings[3] = _arrayConstructor;
+    _arrayConstructor = menu_strings[3];
+    _arrayConstructor[4] = "Exit";
+    menu_strings[3] = _arrayConstructor;
+    _arrayConstructor = menu_strings[3];
+    _arrayConstructor[5] = "EOF";
+    menu_strings[3] = _arrayConstructor;
+    _arrayConstructor = menu_strings[4];
+    _arrayConstructor[0] = <"Increase Human Spacing: <0>M", human_random_spawn>;
+    menu_strings[4] = _arrayConstructor;
+    _arrayConstructor = menu_strings[4];
+    _arrayConstructor[1] = "Decrease Human Spacing";
+    menu_strings[4] = _arrayConstructor;
+    _arrayConstructor = menu_strings[4];
+    _arrayConstructor[2] = <"Increase Bot Spacing: <0>M", bot_random_spawn>;
+    menu_strings[4] = _arrayConstructor;
+    _arrayConstructor = menu_strings[4];
+    _arrayConstructor[3] = "Decrease Bot Spacing";
+    menu_strings[4] = _arrayConstructor;
+    _arrayConstructor = menu_strings[4];
+    _arrayConstructor[4] = "Exit";
+    menu_strings[4] = _arrayConstructor;
+    _arrayConstructor = menu_strings[4];
+    _arrayConstructor[5] = "EOF";
+    menu_strings[4] = _arrayConstructor;
+    MinWait();
+    dva_range = WorkshopSettingInteger("Settings","Dva Range",10,1,100,0);
+    dva_damage = WorkshopSettingInteger("Settings","Dva Damage",10,1,100,1);
 
-    menu_strings[1][0] = "Adjust Bot Team";
-    menu_strings[1][1] = "Adjust Timings";
-    menu_strings[1][2] = "Adjust Spacing";
-    menu_strings[1][3] = "Switch Target Selection";
-    menu_strings[1][4] = "Exit";
-    menu_strings[1][5] = "EOF";
+    doomfist_range = WorkshopSettingInteger("Settings","Doomfist Range",10,1,100,2);
+    doomfist_damage = WorkshopSettingInteger("Settings","Doomfist Damage",10,1,100,3);
 
-    menu_strings[2][0] = "Tank: {0}".Format([bot_team[0]]);
-    menu_strings[2][1] = "DPS 1: {0}".Format([bot_team[1]]);
-    menu_strings[2][2] = "DPS 2: {0}".Format([bot_team[2]]);
-    menu_strings[2][3] = "Support 1: {0}".Format([bot_team[3]]);
-    menu_strings[2][4] = "Support 2: {0}".Format([bot_team[4]]);
-    menu_strings[2][5] = "Exit";
-    menu_strings[2][6] = "EOF";
+    queen_range = WorkshopSettingInteger("Settings","Junker Queen Range",10,1,100,4);
+    queen_damage = WorkshopSettingInteger("Settings","Junker Queen Damage",10,1,100,5);
 
-    menu_strings[3][0] = "Increase Starting Time: {0}s".Format([timer_start]);
-    menu_strings[3][1] = "Decrease Starting Time";
-    menu_strings[3][2] = "Increase Bonus Time: {0}s".Format([timer_add]);
-    menu_strings[3][3] = "Decrease Bonus Time";
-    menu_strings[3][4] = "Exit";
-    menu_strings[3][5] = "EOF";
+    mauga_range = WorkshopSettingInteger("Settings","Mauga Range",10,1,100,6);
+    mauga_damage = WorkshopSettingInteger("Settings","Mauga Damage",10,1,100,7);
 
-    menu_strings[4][0] = "Increase Human Spacing: {0}M".Format([human_random_spawn]);
-    menu_strings[4][1] = "Decrease Human Spacing";
-    menu_strings[4][2] = "Increase Bot Spacing: {0}M".Format([bot_random_spawn]);
-    menu_strings[4][3] = "Decrease Bot Spacing";
-    menu_strings[4][4] = "Exit";
-    menu_strings[4][5] = "EOF";
+    orisa_range = WorkshopSettingInteger("Settings","Orisa Range",10,1,100,8);
+    orisa_damage = WorkshopSettingInteger("Settings","Orisa Damage",10,1,100,9);
+
+    ram_range = WorkshopSettingInteger("Settings","Ramattra Range",10,1,100,10);
+    ram_damage = WorkshopSettingInteger("Settings","Ramattra Damage",10,1,100,11);
+
+    rein_range = WorkshopSettingInteger("Settings","Reinhardt Range",10,1,100,12);
+    rein_damage = WorkshopSettingInteger("Settings","Reinhardt Damage",10,1,100,13);
+
+    hog_range = WorkshopSettingInteger("Settings","Roadhog Range",10,1,100,14);
+    hog_damage = WorkshopSettingInteger("Settings","Roadhog Damage",10,1,100,15);
+
+    sigma_range = WorkshopSettingInteger("Settings","Sigma Range",10,1,100,16);
+    sigma_damage = WorkshopSettingInteger("Settings","Sigma Damage",10,1,100,17);
+
+    winton_range = WorkshopSettingInteger("Settings","Winton Range",10,1,100,18);
+    winton_damage = WorkshopSettingInteger("Settings","Winton Damage",10,1,100,19);
+
+    ball_range = WorkshopSettingInteger("Settings","Wrecking Ball Range",10,1,100,20);
+    ball_damage = WorkshopSettingInteger("Settings","Wrecking Ball Damage",10,1,100,21);
+
+    zarya_range = WorkshopSettingInteger("Settings","Zarya Range",10,1,100,22);
+    zarya_damage = WorkshopSettingInteger("Settings","Zarya Damage",10,1,100,23);
+
+    ashe_range = WorkshopSettingInteger("Settings","Ashe Range",10,1,100,24);
+    ashe_damage = WorkshopSettingInteger("Settings","Ashe Damage",10,1,100,25);
+
+    bastion_range = WorkshopSettingInteger("Settings","Bastion Range",10,1,100,26);
+    bastion_damage = WorkshopSettingInteger("Settings","Bastion Damage",10,1,100,27);
+
+    cassidy_range = WorkshopSettingInteger("Settings","Cassidy Range",10,1,100,28);
+    cassidy_damage = WorkshopSettingInteger("Settings","Cassidy Damage",10,1,100,29);
+
+    echo_range = WorkshopSettingInteger("Settings","Echo Range",10,1,100,30);
+    echo_damage = WorkshopSettingInteger("Settings","Echo Damage",10,1,100,31);
+
+    genji_range = WorkshopSettingInteger("Settings","Genji Range",10,1,100,32);
+    genji_damage = WorkshopSettingInteger("Settings","Genji Damage",10,1,100,33);
+
+    hanzo_range = WorkshopSettingInteger("Settings","Hanzo Range",10,1,100,34);
+    hanzo_damage = WorkshopSettingInteger("Settings","Hanzo Damage",10,1,100,35);
+
+    junkrat_range = WorkshopSettingInteger("Settings","Junkrat Range",10,1,100,36);
+    junkrat_damage = WorkshopSettingInteger("Settings","Junkrat Damage",10,1,100,37);
+
+    mei_range = WorkshopSettingInteger("Settings","Mei Range",10,1,100,38);
+    mei_damage = WorkshopSettingInteger("Settings","Mei Damage",10,1,100,39);
+
+    pharah_range = WorkshopSettingInteger("Settings","Pharah Range",10,1,100,40);
+    pharah_damage = WorkshopSettingInteger("Settings","Pharah Damage",10,1,100,41);
+
+    reaper_range = WorkshopSettingInteger("Settings","Reaper Range",10,1,100,42);
+    reaper_damage = WorkshopSettingInteger("Settings","Reaper Damage",10,1,100,43);
+
+    sojourn_range = WorkshopSettingInteger("Settings","Sojourn Range",10,1,100,44);
+    sojourn_damage = WorkshopSettingInteger("Settings","Sojourn Damage",10,1,100,45);
+
+    soldier_range = WorkshopSettingInteger("Settings","Soldier 76 Range",10,1,100,46);
+    soldier_damage = WorkshopSettingInteger("Settings","Soldier 76 Damage",10,1,100,47);
+
+    sombra_range = WorkshopSettingInteger("Settings","Sombra Range",10,1,100,48);
+    sombra_damage = WorkshopSettingInteger("Settings","Sombra Damage",10,1,100,49);
+
+    sym_range = WorkshopSettingInteger("Settings","Symmetra Range",10,1,100,50);
+    sym_damage = WorkshopSettingInteger("Settings","Symmetra Damage",10,1,100,51);
+
+    torb_range = WorkshopSettingInteger("Settings","Torbjorn Range",10,1,100,52);
+    torb_damage = WorkshopSettingInteger("Settings","Torbjorn Damage",10,1,100,53);
+
+    tracer_range = WorkshopSettingInteger("Settings","Tracer Range",10,1,100,54);
+    tracer_damage = WorkshopSettingInteger("Settings","Tracer Damage",10,1,100,55);
+
+    widow_range = WorkshopSettingInteger("Settings","Widowmaker Range",10,1,100,56);
+    widow_damage = WorkshopSettingInteger("Settings","Widowmaker Damage",10,1,100,57);
+
+    ana_range = WorkshopSettingInteger("Settings","Ana Range",10,1,100,58);
+    ana_damage = WorkshopSettingInteger("Settings","Ana Damage",10,1,100,59);
+
+    bap_range = WorkshopSettingInteger("Settings","Baptiste Range",10,1,100,60);
+    bap_damage = WorkshopSettingInteger("Settings","Baptiste Damage",10,1,100,61);
+
+    brig_range = WorkshopSettingInteger("Settings","Brigitte Range",10,1,100,62);
+    brig_damage = WorkshopSettingInteger("Settings","Brigitte Damage",10,1,100,63);
+
+    illari_range = WorkshopSettingInteger("Settings","Illari Range",10,1,100,64);
+    illari_damage = WorkshopSettingInteger("Settings","Illari Damage",10,1,100,65);
+
+    kiriko_range = WorkshopSettingInteger("Settings","Kiriko Range",10,1,100,66);
+    kiriko_damage = WorkshopSettingInteger("Settings","Kiriko Damage",10,1,100,67);
+
+    weaver_range = WorkshopSettingInteger("Settings","Lifeweaver Range",10,1,100,68);
+    weaver_damage = WorkshopSettingInteger("Settings","Lifeweaver Damage",10,1,100,69);
+
+    lucio_range = WorkshopSettingInteger("Settings","Lucio Range",10,1,100,70);
+    lucio_damage = WorkshopSettingInteger("Settings","Lucio Damage",10,1,100,71);
+
+    mercy_range = WorkshopSettingInteger("Settings","Mercy Range",10,1,100,72);
+    mercy_damage = WorkshopSettingInteger("Settings","Mercy Damage",10,1,100,73);
+
+    moira_range = WorkshopSettingInteger("Settings","Moira Range",10,1,100,74);
+    moira_damage = WorkshopSettingInteger("Settings","Moira Damage",10,1,100,75);
+
+    zen_range = WorkshopSettingInteger("Settings","Zenyatta Range",10,1,100,76);
+    zen_damage = WorkshopSettingInteger("Settings","Zenyatta Damage",10,1,100,77);
 }
 
+rule: "Bot Do Damage"
+Event.OngoingPlayer
+if(TeamOf(EventPlayer()) == Team.Team2)
+{
+    define temp = HeroOf(EventPlayer());
+    
+    if(temp == Hero.Dva)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),dva_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,dva_damage);
+    }
+    else if(temp == Hero.Doomfist)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),doomfist_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,doomfist_damage);
+    }
+    else if(temp == Hero.JunkerQueen)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),queen_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,queen_damage);
+    }
+    else if(temp == Hero.Orisa)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),orisa_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,orisa_damage);
+    }
+    else if(temp == Hero.Ramattra)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),ram_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,ram_damage);
+    }
+    else if(temp == Hero.Reinhardt)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),rein_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,rein_damage);
+    }
+    else if(temp == Hero.Roadhog)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),hog_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,hog_damage);
+    }
+    else if(temp == Hero.Sigma)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),sigma_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,sigma_damage);
+    }
+    else if(temp == Hero.Winston)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),winton_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,winton_damage);
+    }
+    else if(temp == Hero.WreckingBall)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),ball_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,ball_damage);
+    }
+    else if(temp == Hero.Zarya)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),zarya_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,zarya_damage);
+    }
+    else if(temp == Hero.Ashe)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),ashe_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,ashe_damage);
+    }
+    else if(temp == Hero.Bastion)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),bastion_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,bastion_damage);
+    }
+    else if(temp == Hero.Cassidy)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),cassidy_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,cassidy_damage);
+    }
+    else if(temp == Hero.Echo)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),echo_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,echo_damage);
+    }
+    else if(temp == Hero.Genji)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),genji_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,genji_damage);
+    }
+    else if(temp == Hero.Hanzo)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),hanzo_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,hanzo_damage);
+    }
+    else if(temp == Hero.Junkrat)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),junkrat_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,junkrat_damage);
+    }
+    else if(temp == Hero.Mei)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),mei_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,mei_damage);
+    }
+    else if(temp == Hero.Pharah)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),pharah_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,pharah_damage);
+    }
+    else if(temp == Hero.Reaper)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),reaper_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,reaper_damage);
+    }
+    else if(temp == Hero.Sojourn)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),sojourn_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,sojourn_damage);
+    }
+    else if(temp == Hero.Soldier76)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),soldier_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,soldier_damage);
+    }
+    else if(temp == Hero.Sombra)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),sombra_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,sombra_damage);
+    }
+    else if(temp == Hero.Symmetra)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),sym_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,sym_damage);
+    }
+    else if(temp == Hero.Torbjorn)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),torb_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,torb_damage);
+    }
+    else if(temp == Hero.Tracer)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),tracer_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,tracer_damage);
+    }
+    else if(temp == Hero.Widowmaker)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),widow_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,widow_damage);
+    }
+    else if(temp == Hero.Ana)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),ana_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,ana_damage);
+    }
+    else if(temp == Hero.Baptiste)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),bap_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,bap_damage);
+    }
+    else if(temp == Hero.Brigitte)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),brig_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,brig_damage);
+    }
+    else if(temp == Hero.Kiriko)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),kiriko_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,kiriko_damage);
+    }
+    else if(temp == Hero.Lifeweaver)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),weaver_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,weaver_damage);
+    }
+    else if(temp == Hero.Lucio)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),lucio_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,lucio_damage);
+    }
+    else if(temp == Hero.Mercy)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),mercy_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,mercy_damage);
+    }
+    else if(temp == Hero.Moira)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),moira_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,moira_damage);
+    }
+    else if(temp == Hero.Zenyatta)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),zen_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,zen_damage);
+    }
+    else if(MaxHealthOfType(EventPlayer(),HealthType.Armor) == 0)
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),kiriko_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,kiriko_damage);
+    }
+    else
+    {
+        StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()),mauga_range,Team.Team1,RadiusLOS.SurfacesAndEnemyBarriers),EventPlayer(),1,mauga_damage);
+    }
+            
+        
+    Wait(1);
+    LoopIfConditionIsTrue();
+}
 
 rule: "Create Menu"
 Event.OngoingPlayer
-if(human_ready == false)
-if(in_menu == false)
-if(EventPlayer() == PlayersInSlot(0,Team.Team1))
-if(IsButtonHeld(EventPlayer(),Button.Interact))
+if (human_ready == false)
+if (in_menu == false)
+if (EventPlayer() == PlayersInSlot(0, Team.Team1))
+if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
 {
-    //create spawn menu
     menu_pos = 0;
     menu_depth = 0;
-    
-    menu_strings[0][0] = "->"+menu_strings[0][0];
-    SetMoveSpeed(EventPlayer(),1);
-    CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[0][0],menu_strings[0][1],"{0}\n{1}\n{2}".Format([menu_strings[0][2],menu_strings[0][3],menu_strings[0][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
-    Wait(0.25);
+    _arrayConstructor = FirstOf(menu_strings);
+    _arrayConstructor[0] = <"<0><1>", "->", FirstOf(FirstOf(menu_strings))>;
+    menu_strings[0] = _arrayConstructor;
+    SetMoveSpeed(EventPlayer(), 1);
+    CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(FirstOf(menu_strings)), FirstOf(menu_strings)[1], <"<0>\n<1>\n<2>", FirstOf(menu_strings)[2], FirstOf(menu_strings)[3], FirstOf(menu_strings)[4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
+    Wait(0.25, WaitBehavior.IgnoreCondition);
     in_menu = true;
 }
 
 rule: "Move Menu"
 Event.OngoingPlayer
-if(in_menu == true)
-if(EventPlayer() == PlayersInSlot(0,Team.Team1))
+if (in_menu == true)
+if (EventPlayer() == PlayersInSlot(0, Team.Team1))
 {
-    if(SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())) > 0)
+    if (SpeedOfInDirection(EventPlayer(), FacingDirectionOf(EventPlayer())) > 0)
     {
-        menu_pos --;
-        if(menu_pos < 0)
+        menu_pos -= 1;
+        if (menu_pos < 0)
         {
             menu_pos = 0;
         }
         else
         {
-            menu_strings[menu_depth][menu_pos+1] = StringSlice( menu_strings[menu_depth][menu_pos+1],2,100);
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos + 1] = StringSlice(menu_strings[menu_depth][menu_pos + 1], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
         }
     }
-    if(SpeedOfInDirection(EventPlayer(),FacingDirectionOf(EventPlayer())) < 0)
+    if (SpeedOfInDirection(EventPlayer(), FacingDirectionOf(EventPlayer())) < 0)
     {
-        menu_pos ++;
-        if(menu_strings[menu_depth][menu_pos] == "EOF")
+        menu_pos += 1;
+        if (menu_strings[menu_depth][menu_pos] == "EOF")
         {
-            menu_pos --;
+            menu_pos -= 1;
         }
         else
         {
-            menu_strings[menu_depth][menu_pos-1] = StringSlice( menu_strings[menu_depth][menu_pos-1],2,100);
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos - 1] = StringSlice(menu_strings[menu_depth][menu_pos - 1], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
         }
     }
-    Wait(0.2);
+    Wait(0.2, WaitBehavior.IgnoreCondition);
     LoopIfConditionIsTrue();
 }
 
 rule: "Interact Menu"
 Event.OngoingPlayer
-if(in_menu == true)
-if(EventPlayer() == PlayersInSlot(0,Team.Team1))
-if(IsButtonHeld(EventPlayer(),Button.Interact))
+if (in_menu == true)
+if (EventPlayer() == PlayersInSlot(0, Team.Team1))
+if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
 {
-    if(menu_depth == 0)
+    if (menu_depth == 0)
     {
-        if(menu_pos == 0)//ready up
+        if (menu_pos == 0)
         {
             human_ready = true;
             in_menu = false;
             DestroyAllHudText();
-            SetMoveSpeed(EventPlayer(),100);
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            SetMoveSpeed(EventPlayer(), 100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
         }
-        else if(menu_pos == 1)//set human spawn
+        else if (menu_pos == 1)
         {
             human_spawn_location = PositionOf(EventPlayer());
-            SmallMessage(AllPlayers(),"Human Spawn Set to: " + human_spawn_location);
+            SmallMessage(AllPlayers(Team.All), <"<0><1>", "Human Spawn Set to: ", human_spawn_location>);
         }
-        else if(menu_pos == 2)//set bot spawn
+        else if (menu_pos == 2)
         {
             bot_spawn_location = PositionOf(EventPlayer());
-            SmallMessage(AllPlayers(),"Bot Spawn Set to: " + bot_spawn_location);
+            SmallMessage(AllPlayers(Team.All), <"<0><1>", "Bot Spawn Set to: ", bot_spawn_location>);
         }
-        else if(menu_pos == 3)//settings
+        else if (menu_pos == 3)
         {
-            //settings
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 1;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
             DestroyAllHudText();
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(menu_strings[1]), menu_strings[1][1], <"<0>\n<1>\n<2>", menu_strings[1][2], menu_strings[1][3], menu_strings[1][4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
-        else if(menu_pos == 4)//exit
+        else if (menu_pos == 4)
         {
-            //exit
-            SetMoveSpeed(EventPlayer(),100);
+            SetMoveSpeed(EventPlayer(), 100);
             DestroyAllHudText();
-            Wait(0.25);
+            Wait(0.25, WaitBehavior.IgnoreCondition);
             in_menu = false;
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
         }
     }
-    else if(menu_depth == 1)
+    else if (menu_depth == 1)
     {
-        if(menu_pos == 0)
+        if (menu_pos == 0)
         {
-            //change bot team
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 2;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
             DestroyAllHudText();
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[2][0],menu_strings[2][1],"{0}\n{1}\n{2}".Format([menu_strings[2][2],menu_strings[2][3],"{0}\n{1}".Format([menu_strings[2][4],menu_strings[2][5]])])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(menu_strings[2]), menu_strings[2][1], <"<0>\n<1>\n<2>", menu_strings[2][2], menu_strings[2][3], <"<0>\n<1>", menu_strings[2][4], menu_strings[2][5]>>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
-        if(menu_pos == 1)
+        if (menu_pos == 1)
         {
-            //change timings
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 3;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
             DestroyAllHudText();
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[3][0],menu_strings[3][1],"{0}\n{1}\n{2}".Format([menu_strings[3][2],menu_strings[3][3],menu_strings[3][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(menu_strings[3]), menu_strings[3][1], <"<0>\n<1>\n<2>", menu_strings[3][2], menu_strings[3][3], menu_strings[3][4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
-        if(menu_pos == 2)
+        if (menu_pos == 2)
         {
-            //change spacing
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 4;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
             DestroyAllHudText();
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[4][0],menu_strings[4][1],"{0}\n{1}\n{2}".Format([menu_strings[4][2],menu_strings[4][3],menu_strings[4][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(menu_strings[4]), menu_strings[4][1], <"<0>\n<1>\n<2>", menu_strings[4][2], menu_strings[4][3], menu_strings[4][4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
-        if(menu_pos == 3)
+        if (menu_pos == 3)
         {
-            //change target selection
-            if(target_method == 0)
+            if (target_method == 0)
             {
                 target_method = 1;
-                SmallMessage(EventPlayer(),"Target Selection Changed to Manual");
+                SmallMessage(EventPlayer(), "Target Selection Changed to Manual");
             }
             else
             {
                 target_method = 0;
-                SmallMessage(EventPlayer(),"Target Selection Changed to Auto");
+                SmallMessage(EventPlayer(), "Target Selection Changed to Auto");
             }
         }
-        if(menu_pos == 4)
+        if (menu_pos == 4)
         {
-            //exit
             DestroyAllHudText();
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 0;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[0][0],menu_strings[0][1],"{0}\n{1}\n{2}".Format([menu_strings[0][2],menu_strings[0][3],menu_strings[0][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(FirstOf(menu_strings)), FirstOf(menu_strings)[1], <"<0>\n<1>\n<2>", FirstOf(menu_strings)[2], FirstOf(menu_strings)[3], FirstOf(menu_strings)[4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
     }
-    else if(menu_depth == 2)
+    else if (menu_depth == 2)
     {
-        if(menu_pos == 0)
+        if (menu_pos == 0)
         {
-            tank_id ++;
-            if(tank_id > 11)
+            tank_id += 1;
+            if (tank_id > 11)
             {
                 tank_id = 0;
             }
             bot_team[0] = AllTankHeroes()[tank_id];
-            menu_strings[2][0] = "->Tank: {0}".Format([bot_team[0]]);
+            _arrayConstructor = menu_strings[2];
+            _arrayConstructor[0] = <"->Tank: <0>", FirstOf(bot_team)>;
+            menu_strings[2] = _arrayConstructor;
         }
-        if(menu_pos == 1)
+        if (menu_pos == 1)
         {
-            dps_1_id ++;
-            if(dps_1_id > 16)
+            dps_1_id += 1;
+            if (dps_1_id > 16)
             {
                 dps_1_id = 0;
             }
             bot_team[1] = AllDamageHeroes()[dps_1_id];
-            menu_strings[2][1] = "->DPS 1: {0}".Format([bot_team[1]]);
+            _arrayConstructor = menu_strings[2];
+            _arrayConstructor[1] = <"->DPS 1: <0>", bot_team[1]>;
+            menu_strings[2] = _arrayConstructor;
         }
-        if(menu_pos == 2)
+        if (menu_pos == 2)
         {
-            dps_2_id ++;
-            if(dps_2_id > 16)
+            dps_2_id += 1;
+            if (dps_2_id > 16)
             {
                 dps_2_id = 0;
             }
             bot_team[2] = AllDamageHeroes()[dps_2_id];
-            menu_strings[2][2] = "->DPS 1: {0}".Format([bot_team[2]]);
+            _arrayConstructor = menu_strings[2];
+            _arrayConstructor[2] = <"->DPS 1: <0>", bot_team[2]>;
+            menu_strings[2] = _arrayConstructor;
         }
-        if(menu_pos == 3)
+        if (menu_pos == 3)
         {
-            support_1_id ++;
-            if(support_1_id > 8)
+            support_1_id += 1;
+            if (support_1_id > 8)
             {
                 support_1_id = 0;
             }
             bot_team[3] = AllSupportHeroes()[support_1_id];
-            menu_strings[2][3] = "->Support 1: {0}".Format([bot_team[3]]);
+            _arrayConstructor = menu_strings[2];
+            _arrayConstructor[3] = <"->Support 1: <0>", bot_team[3]>;
+            menu_strings[2] = _arrayConstructor;
         }
-        if(menu_pos == 4)
+        if (menu_pos == 4)
         {
-            support_2_id ++;
-            if(support_2_id > 8)
+            support_2_id += 1;
+            if (support_2_id > 8)
             {
                 support_2_id = 0;
             }
             bot_team[4] = AllSupportHeroes()[support_2_id];
-            menu_strings[2][4] = "->Support 1: {0}".Format([bot_team[4]]);
+            _arrayConstructor = menu_strings[2];
+            _arrayConstructor[4] = <"->Support 1: <0>", bot_team[4]>;
+            menu_strings[2] = _arrayConstructor;
         }
-        if(menu_pos == 5)
+        if (menu_pos == 5)
         {
             DestroyAllHudText();
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 1;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(menu_strings[1]), menu_strings[1][1], <"<0>\n<1>\n<2>", menu_strings[1][2], menu_strings[1][3], menu_strings[1][4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
     }
-    else if(menu_depth == 3)
+    else if (menu_depth == 3)
     {
-        if(menu_pos == 0)
+        if (menu_pos == 0)
         {
             timer_start += 0.5;
-            menu_strings[3][0] = "->Increase Starting Time: {0}".Format([timer_start]);
+            _arrayConstructor = menu_strings[3];
+            _arrayConstructor[0] = <"->Increase Starting Time: <0>", timer_start>;
+            menu_strings[3] = _arrayConstructor;
         }
-        if(menu_pos == 1)
+        if (menu_pos == 1)
         {
             timer_start -= 0.5;
-            if(timer_start < 0.5)
+            if (timer_start < 0.5)
             {
                 timer_start = 0.5;
             }
-            menu_strings[3][0] = "Increase Starting Time: {0}".Format([timer_start]);
+            _arrayConstructor = menu_strings[3];
+            _arrayConstructor[0] = <"Increase Starting Time: <0>", timer_start>;
+            menu_strings[3] = _arrayConstructor;
         }
-        if(menu_pos == 2)
+        if (menu_pos == 2)
         {
             timer_add += 0.5;
-            menu_strings[3][2] = "->Increase Bonus Time: {0}".Format([timer_add]);
+            _arrayConstructor = menu_strings[3];
+            _arrayConstructor[2] = <"->Increase Bonus Time: <0>", timer_add>;
+            menu_strings[3] = _arrayConstructor;
         }
-        if(menu_pos == 3)
+        if (menu_pos == 3)
         {
             timer_add -= 0.5;
-            if(timer_add < 0)
+            if (timer_add < 0)
             {
                 timer_add = 0;
             }
-            menu_strings[3][2] = "Increase Bonus Time: {0}".Format([timer_add]);
+            _arrayConstructor = menu_strings[3];
+            _arrayConstructor[2] = <"Increase Bonus Time: <0>", timer_add>;
+            menu_strings[3] = _arrayConstructor;
         }
-        if(menu_pos == 4)
+        if (menu_pos == 4)
         {
-            //exit
             DestroyAllHudText();
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 1;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(menu_strings[1]), menu_strings[1][1], <"<0>\n<1>\n<2>", menu_strings[1][2], menu_strings[1][3], menu_strings[1][4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
     }
-    else if(menu_depth == 4)
+    else if (menu_depth == 4)
     {
-        if(menu_pos == 0)
+        if (menu_pos == 0)
         {
             human_random_spawn += 0.5;
-            menu_strings[4][0] = "->Increase Human Spacing: {0}M".Format([human_random_spawn]);
+            _arrayConstructor = menu_strings[4];
+            _arrayConstructor[0] = <"->Increase Human Spacing: <0>M", human_random_spawn>;
+            menu_strings[4] = _arrayConstructor;
         }
-        if(menu_pos == 1)
+        if (menu_pos == 1)
         {
             human_random_spawn -= 0.5;
-            if(human_random_spawn < 0)
+            if (human_random_spawn < 0)
             {
                 human_random_spawn = 0;
             }
-            menu_strings[4][0] = "Increase Human Spacing: {0}M".Format([human_random_spawn]);
+            _arrayConstructor = menu_strings[4];
+            _arrayConstructor[0] = <"Increase Human Spacing: <0>M", human_random_spawn>;
+            menu_strings[4] = _arrayConstructor;
         }
-        if(menu_pos == 2)
+        if (menu_pos == 2)
         {
             bot_random_spawn += 0.5;
-            menu_strings[4][2] = "->Increase Bot Spacing: {0}M".Format([bot_random_spawn]);
+            _arrayConstructor = menu_strings[4];
+            _arrayConstructor[2] = <"->Increase Bot Spacing: <0>M", bot_random_spawn>;
+            menu_strings[4] = _arrayConstructor;
         }
-        if(menu_pos == 3)
+        if (menu_pos == 3)
         {
             bot_random_spawn -= 0.5;
-            if(bot_random_spawn < 0)
+            if (bot_random_spawn < 0)
             {
                 bot_random_spawn = 0;
             }
-            menu_strings[4][2] = "Increase Bot Spacing: {0}M".Format([bot_random_spawn]);
+            _arrayConstructor = menu_strings[4];
+            _arrayConstructor[2] = <"Increase Bot Spacing: <0>M", bot_random_spawn>;
+            menu_strings[4] = _arrayConstructor;
         }
-        if(menu_pos == 4)
+        if (menu_pos == 4)
         {
-            //exit
             DestroyAllHudText();
-            menu_strings[menu_depth][menu_pos] = StringSlice( menu_strings[menu_depth][menu_pos],2,100);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = StringSlice(menu_strings[menu_depth][menu_pos], 2, 100);
+            menu_strings[menu_depth] = _arrayConstructor;
             menu_depth = 1;
             menu_pos = 0;
-            menu_strings[menu_depth][menu_pos] = "->"+menu_strings[menu_depth][menu_pos];
-            CreateHudText(EventPlayer(),"{0}\n{1}\n{2}".Format([menu_strings[1][0],menu_strings[1][1],"{0}\n{1}\n{2}".Format([menu_strings[1][2],menu_strings[1][3],menu_strings[1][4]])]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String);
+            _arrayConstructor = menu_strings[menu_depth];
+            _arrayConstructor[menu_pos] = <"<0><1>", "->", menu_strings[menu_depth][menu_pos]>;
+            menu_strings[menu_depth] = _arrayConstructor;
+            CreateHudText(EventPlayer(), <"<0>\n<1>\n<2>", FirstOf(menu_strings[1]), menu_strings[1][1], <"<0>\n<1>\n<2>", menu_strings[1][2], menu_strings[1][3], menu_strings[1][4]>>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
         }
     }
 }
 
-
-
 rule: "Is Ready"
-Event.OngoingGlobal
-if(human_ready == true)
-{   
+if (human_ready == true)
+{
     DestroyAllHudText();
-    //move players
-    for(define i = 0; i < 5; i++)
+    i = 0;
+    while (i < 5)
     {
-        Teleport(PlayersInSlot(i,Team.Team1),human_spawn_location+Vector(RandomReal(-human_random_spawn,human_random_spawn),0,RandomReal(-human_random_spawn,human_random_spawn)));
-        SetFacing(PlayersInSlot(i,Team.Team1),DirectionTowards(PlayersInSlot(i,Team.Team1),bot_spawn_location),Relative.ToWorld);
+        Teleport(PlayersInSlot(i, Team.Team1), human_spawn_location + Vector(RandomReal(human_random_spawn * -1, human_random_spawn), [], RandomReal(human_random_spawn * -1, human_random_spawn)));
+        SetFacing(PlayersInSlot(i, Team.Team1), DirectionTowards(PlayersInSlot(i, Team.Team1), bot_spawn_location), Relative.ToWorld);
+        i += 1;
     }
-    Wait(0.5);
-    SetStatus(AllPlayers(),null,Status.Frozen,3);
-    //create bots
-    for(define i = 0; i < 5; i++)
+    Wait(0.5, WaitBehavior.IgnoreCondition);
+    SetStatus(AllPlayers(Team.All), null, Status.Frozen, 3);
+    i_0 = 0;
+    while (i_0 < 5)
     {
-        bot_target = CreateDummyBot(bot_team[i],Team.Team2,i,bot_spawn_location+Vector(RandomReal(-bot_random_spawn,bot_random_spawn),0,RandomReal(-bot_random_spawn,bot_random_spawn)),DirectionTowards(bot_spawn_location,PlayersInSlot(0,Team.Team1)));
-        if(target_method == 0)
+        CreateDummyBot(bot_team[i_0], Team.Team2, i_0, bot_spawn_location + Vector(RandomReal(bot_random_spawn * -1, bot_random_spawn), [], RandomReal(bot_random_spawn * -1, bot_random_spawn)), DirectionTowards(bot_spawn_location, PlayersInSlot(0, Team.Team1)));
+        bot_target = LastCreatedEntity();
+        if (target_method == 0)
         {
-            SetDamageReceived(bot_target,10);
-            bot_target.healing_ref = StartHealOverTime(LastCreatedEntity(),null,200,50);
+            SetDamageReceived(bot_target, 10);
+            StartHealOverTime(LastCreatedEntity(), null, 200, 50);
+            bot_target.healing_ref = LastHealOverTime();
         }
         else
         {
-            bot_target.healing_ref = StartHealOverTime(LastCreatedEntity(),null,200,100);
-            SetMaxHealth(bot_target,200);
+            StartHealOverTime(LastCreatedEntity(), null, 200, 100);
+            bot_target.healing_ref = LastHealOverTime();
+            SetMaxHealth(bot_target, 200);
         }
         bot_target.bot_movement = false;
         MinWait();
+        i_0 += 1;
     }
-    SetAbilityCooldown(AllPlayers(),Button.Ability1,0);
-    SetAbilityCooldown(AllPlayers(),Button.Ability2,0);
-    SmallMessage(AllPlayers(),"Starting in 3");
-    Wait(1);
-    SmallMessage(AllPlayers(),"Starting in 2");
-    Wait(1);
-    SmallMessage(AllPlayers(),"Starting in 1");
-    Wait(1);
+    SetAbilityCooldown(AllPlayers(Team.All), Button.Ability1, 0);
+    SetAbilityCooldown(AllPlayers(Team.All), Button.Ability2, 0);
+    SmallMessage(AllPlayers(Team.All), "Starting in 3");
+    Wait(1, WaitBehavior.IgnoreCondition);
+    SmallMessage(AllPlayers(Team.All), "Starting in 2");
+    Wait(1, WaitBehavior.IgnoreCondition);
+    SmallMessage(AllPlayers(Team.All), "Starting in 1");
+    Wait(1, WaitBehavior.IgnoreCondition);
     timer_current = timer_start;
     total_time = 0;
-    if(target_method == 0)
+    if (target_method == 0)
     {
         bot_target = RandomValueInArray(AllLivingPlayers(Team.Team2));
-        SetDamageReceived(bot_target,100);
-        CreateHudText(AllPlayers(),"Time Left: {0}\nTarget: {1}".Format([timer_current,HeroIconString(HeroOf(bot_target))]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
-        CreateHudText(AllPlayers(),null,null,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n{0}".Format([HeroIconString(HeroOf(bot_target))]),Location.Top,1,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
+        SetDamageReceived(bot_target, 100);
+        CreateHudText(AllPlayers(Team.All), <"Time Left: <0>\nTarget: <1>", timer_current, HeroIconString(HeroOf(bot_target))>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
+        CreateHudText(AllPlayers(Team.All), null, null, <"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<0>", HeroIconString(HeroOf(bot_target))>, Location.Top, 1, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
     }
     else
     {
-        CreateHudText(AllPlayers(),"Time Left: {0}".Format([timer_current]),null,null,Location.Left,0,Color.White,Color.White,Color.White,HudTextRev.String,Spectators.DefaultVisibility);
+        CreateHudText(AllPlayers(Team.All), <"Time Left: <0>", timer_current>, null, null, Location.Left, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
     }
-
     AllLivingPlayers(Team.Team2).bot_movement = true;
-
 }
 
 rule: "Timer"
-Event.OngoingGlobal
-if(timer_current > 0)
+if (timer_current > 0)
 {
-    while(timer_current > 0 && bot_death != 5)
+    while (timer_current > 0 && bot_death != 5)
     {
-        Wait(1/10);
-        timer_current -= 1/10;
-        total_time += 1/10;
+        Wait(0.1, WaitBehavior.IgnoreCondition);
+        timer_current -= 0.1;
+        total_time += 0.1;
     }
     DestroyAllDummyBots();
     DestroyAllHudText();
-    if(timer_current == 0)
+    if (timer_current == 0)
     {
-        SmallMessage(AllPlayers(),"Failed to Kill all Bots in Time");
+        SmallMessage(AllPlayers(Team.All), "Failed to Kill all Bots in Time");
     }
-    if(bot_death == 5)
+    if (bot_death == 5)
     {
-        SmallMessage(AllPlayers(),"Killed all Bots in {0}s".Format([total_time]));
+        SmallMessage(AllPlayers(Team.All), <"Killed all Bots in <0>s", total_time>);
     }
     human_ready = false;
     timer_current = 0;
@@ -477,59 +957,57 @@ if(timer_current > 0)
 
 rule: "Bot Death"
 Event.OnDeath
-if(TeamOf(Victim()) == Team.Team2)
+if (TeamOf(Victim()) == Team.Team2)
 {
     timer_current += timer_add;
-    bot_death ++;
-    if(target_method == 0)
+    bot_death += 1;
+    if (target_method == 0)
     {
         bot_target = RandomValueInArray(AllLivingPlayers(Team.Team2));
-        SetDamageReceived(bot_target,100);
+        SetDamageReceived(bot_target, 100);
     }
-    Wait(0.1);
-    DestroyDummyBot(Team.Team2,SlotOf(Victim()));
+    Wait(0.1, WaitBehavior.IgnoreCondition);
+    DestroyDummyBot(Team.Team2, SlotOf(Victim()));
 }
 
 rule: "Bot Movement"
-Event.OngoingGlobal
-if(timer_current > 0)
+if (timer_current > 0)
 {
-    define temp_point = bot_spawn_location + Vector(RandomReal(-bot_random_spawn,bot_random_spawn),0,RandomReal(-bot_random_spawn,bot_random_spawn));
-    define temp_direction = DirectionTowards(FirstOf(AllLivingPlayers(Team.Team2)),temp_point);
-    StartThrottleInDirection(AllLivingPlayers(Team.Team2),temp_direction,1);
-    Wait(RandomReal(bot_movement_time*0.8,bot_movement_time*1.2));
+    temp_point = bot_spawn_location + Vector(RandomReal(bot_random_spawn * -1, bot_random_spawn), [], RandomReal(bot_random_spawn * -1, bot_random_spawn));
+    temp_direction = DirectionTowards(FirstOf(AllLivingPlayers(Team.Team2)), temp_point);
+    StartThrottleInDirection(AllLivingPlayers(Team.Team2), temp_direction, 1, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+    Wait(RandomReal(bot_movement_time * 0.8, bot_movement_time * 1.2), WaitBehavior.IgnoreCondition);
     LoopIfConditionIsTrue();
 }
 
 rule: "Queen Speed Boost"
 Event.OngoingPlayer
-if(TeamOf(EventPlayer()) == Team.Team2)
-if(HeroOf(EventPlayer()) == Hero.JunkerQueen)
-if(timer_current > 0)
+if (TeamOf(EventPlayer()) == Team.Team2)
+if (HeroOf(EventPlayer()) == Hero.JunkerQueen)
+if (timer_current > 0)
 {
-    PressButton(EventPlayer(),Button.Ability1);
-    Wait(3);
+    PressButton(EventPlayer(), Button.Ability1);
+    Wait(3, WaitBehavior.IgnoreCondition);
     LoopIfConditionIsTrue();
 }
 
 rule: "Frog Speed Boost"
 Event.OngoingPlayer
-if(TeamOf(EventPlayer()) == Team.Team2)
-if(HeroOf(EventPlayer()) == Hero.JunkerQueen)
-if(timer_current > 0)
+if (TeamOf(EventPlayer()) == Team.Team2)
+if (HeroOf(EventPlayer()) == Hero.JunkerQueen)
+if (timer_current > 0)
 {
-    PressButton(EventPlayer(),Button.Ability2);
-    Wait(3);
+    PressButton(EventPlayer(), Button.Ability2);
+    Wait(3, WaitBehavior.IgnoreCondition);
     LoopIfConditionIsTrue();
 }
 
 rule: "Bot Facing"
 Event.OngoingPlayer
-if(timer_current > 0)
-if(TeamOf(EventPlayer()) == Team.Team2)
+if (timer_current > 0)
+if (TeamOf(EventPlayer()) == Team.Team2)
 {
-    SetFacing(EventPlayer(),DirectionTowards(EventPlayer(),ClosestPlayerTo(EventPlayer(),Team.Team1)),Relative.ToWorld);
-    Wait(1/3);
+    SetFacing(EventPlayer(), DirectionTowards(EventPlayer(), ClosestPlayerTo(EventPlayer(), Team.Team1)), Relative.ToWorld);
+    Wait(0.333, WaitBehavior.IgnoreCondition);
     LoopIfConditionIsTrue();
 }
-
